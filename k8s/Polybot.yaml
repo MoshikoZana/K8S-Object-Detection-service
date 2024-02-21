@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: Polybot-deployment
+  labels:
+    app: Polybot
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: Polybot
+  template:
+    metadata:
+      labels:
+        app: Polybot
+    spec:
+      containers:
+      - name: Polybot
+        image: moshikozana/poly-aws:latest
+        ports:
+        - containerPort: 80  # Assuming your bot listens on port 80
+        livenessProbe:
+          httpGet:
+            path: /healthz  # Update this with the actual path for your liveness probe
+            port: 80
+          initialDelaySeconds: 10
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /readyz  # Update this with the actual path for your readiness probe
+            port: 80
+          initialDelaySeconds: 10
+          periodSeconds: 10
+        resources:
+          requests:
+            cpu: "100m"  # Requesting 0.1 CPU
+            memory: "128Mi"  # Requesting 128MB memory
+          limits:
+            cpu: "200m"  # Limiting to 0.2 CPU
+            memory: "256Mi"  # Limiting to 256MB memory

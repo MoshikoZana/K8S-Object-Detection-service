@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: yolov5-deployment
+  labels:
+    app: yolov5
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: yolov5
+  template:
+    metadata:
+      labels:
+        app: yolov5
+    spec:
+      containers:
+      - name: yolov5
+        image: your-yolov5-image:tag
+        resources:
+          requests:
+            cpu: "100m"  # Requesting 0.1 CPU
+            memory: "128Mi"  # Requesting 128MB memory
+          limit
