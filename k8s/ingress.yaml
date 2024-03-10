@@ -1,17 +1,36 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: online-boutique-ing
+  name: polybot-ingress
 spec:
+  tls:
+    - hosts:
+      - moshiko-bot.devops-int-college.com
+      secretName: tls-secret
   ingressClassName: nginx
   rules:
-  - host: # TODO YOUR LB DOMAIN HERE. e.g. www.example.com
-    http:
-      paths:
-      - path: /
-        pathType: Prefix
-        backend:
-          service:
-            name: frontend
-            port:
-              number: 80
+    - host: moshiko-bot.devops-int-college.com
+      http:
+        paths:
+        - path: /
+          pathType: Prefix
+          backend:
+            service:
+              name: poly-service
+              port:
+                number: 8443
+        - path: /grafana
+          pathType: Prefix
+          backend:
+            service:
+              name: grafana
+              port:
+                number: 3000
+
+        - path: /
+          pathType: Prefix
+          backend:
+            service:
+              name: prometheus-server
+              port:
+                number: 80

@@ -1,24 +1,30 @@
+# k8s/deployment-demo.yaml
+
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: yolov5-deployment
+  name: yolo5-deployment
   labels:
-    app: yolov5
+    app: yolo5
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: yolov5
+      app: yolo5
   template:
     metadata:
       labels:
-        app: yolov5
+        app: yolo5
     spec:
       containers:
       - name: yolov5
-        image: your-yolov5-image:tag
-        resources:
-          requests:
-            cpu: "100m"  # Requesting 0.1 CPU
-            memory: "128Mi"  # Requesting 128MB memory
-          limit
+        image: moshikozana/yolo-k8s:latestv3
+        env:
+          - name: REGION_NAME
+            value: "eu-north-1"
+          - name: SQS_QUEUE_NAME
+            value: https://sqs.eu-north-1.amazonaws.com/352708296901/MoshikoSQS
+          - name: BUCKET_NAME
+            value: moshikosbucket
+          - name: DYNAMO_TABLE
+            value: Moshiko_Yolo

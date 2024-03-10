@@ -1,40 +1,52 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: Polybot-deployment
+  name: polybot
   labels:
-    app: Polybot
+    app: poly
 spec:
-  replicas: 3
+  replicas: 1
   selector:
     matchLabels:
-      app: Polybot
+      app: poly
   template:
     metadata:
       labels:
-        app: Polybot
+        app: poly
     spec:
+      volumes:
+        - name: tls-volume
+          secret:
+            secretName: tls-secret
       containers:
-      - name: Polybot
-        image: moshikozana/poly-aws:latest
-        ports:
-        - containerPort: 80  # Assuming your bot listens on port 80
-        livenessProbe:
-          httpGet:
-            path: /healthz  # Update this with the actual path for your liveness probe
-            port: 80
-          initialDelaySeconds: 10
-          periodSeconds: 10
-        readinessProbe:
-          httpGet:
-            path: /readyz  # Update this with the actual path for your readiness probe
-            port: 80
-          initialDelaySeconds: 10
-          periodSeconds: 10
+      - name: poly
+        image: moshikozana/poly-aws:latestv2
+        env:
+          - name: REGION_NAME
+            value: "eu-north-1"
+          - name: TELEGRAM_APP_URL
+            value: moshiko-bot.devops-int-college.com
+        volumeMounts:
+        - name: tls-volume
+          readOnly: true
+          mountPath: "/tls-volume"
         resources:
           requests:
-            cpu: "100m"  # Requesting 0.1 CPU
-            memory: "128Mi"  # Requesting 128MB memory
+            memory: "100Mi"
+            cpu: "100m"
           limits:
-            cpu: "200m"  # Limiting to 0.2 CPU
-            memory: "256Mi"  # Limiting to 256MB memory
+            memory: "200Mi"
+            cpu: "200m"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: poly-service
+spec:
+  selector:
+    app: poly
+  ports:
+    - protocol: TCP
+      port: 8443
+      targetPort: 8443
+  type: ClusterIP
